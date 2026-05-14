@@ -10,14 +10,13 @@ class Api::V1::AffordabilityAssessmentsController < ApplicationController
       return
     end
 
-    assessment = nil
-    # assessment = AffordabilityCalculator.new(
-    #   income: params[:annual_income],
-    #   expenses: params[:monthly_expenses],
-    #   deposit: params[:deposit_amount],
-    #   property_value: params[:property_value],
-    #   term_years: params[:term_years]
-    # ).call
+    assessment = AffordabilityCalculator.new(
+      income: params[:annual_income],
+      expenses: params[:monthly_expenses],
+      deposit: params[:deposit_amount],
+      property_value: params[:property_value],
+      term_years: params[:term_years]
+    ).perform
 
     render json: assessment, status: :ok
   end
