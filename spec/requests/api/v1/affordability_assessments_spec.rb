@@ -26,15 +26,15 @@ RSpec.describe "Api::V1::AffordabilityAssessments", type: :request do
           explanation: "This is the explanation."
         }
 
-        # expect_any_instance_of(AffordabilityCalculator).to receive(:perform).and_return(mock_result)
+        expect_any_instance_of(AffordabilityCalculator).to receive(:perform).and_return(mock_result)
 
         post "/api/v1/affordability_assessments", params: valid_params, as: :json
         
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
-        # expect(json_response["decision"]).to eq("mocked_status")
-        # expect(json_response["maximum_borrowing_estimate"]).to eq(999999)
-        # expect(json_response["explanation"]).to eq("This is the explanation.")
+        expect(json_response["decision"]).to eq("mocked_status")
+        expect(json_response["maximum_borrowing_estimate"]).to eq(999999)
+        expect(json_response["explanation"]).to eq("This is the explanation.")
       end
     end
 
@@ -42,7 +42,7 @@ RSpec.describe "Api::V1::AffordabilityAssessments", type: :request do
 
       it "returns a 422 error and never calls the calculator" do
 
-        # expect_any_instance_of(AffordabilityCalculator).not_to receive(:perform)
+        expect_any_instance_of(AffordabilityCalculator).not_to receive(:perform)
 
         post "/api/v1/affordability_assessments", params: { annual_income: 50000 }, as: :json
         

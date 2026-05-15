@@ -1,4 +1,8 @@
 class AffordabilityCalculator
+
+  MAX_LOAN_TO_VALUE = 90.0
+  MAX_DEBT_TO_INCOME = 45.0
+  INCOME_MULTIPLIER = 4.5
   
   def initialize(income:, expenses:, deposit:, property_value:, term_years:)
     @income = income.to_f
@@ -13,10 +17,10 @@ class AffordabilityCalculator
 
     ltv = ((loan_amount / @property_value) * 100).round(2)
     dti = (((@expenses * 12) / @income) * 100).round(2)
-    max_borrowing = (@income * 4.5).round(2)
+    max_borrowing = (@income * INCOME_MULTIPLIER).round(2)
     
-    ltv_ok = ltv <= 90
-    dti_ok = dti <= 45
+    ltv_ok = ltv <= MAX_LOAN_TO_VALUE
+    dti_ok = dti <= MAX_DEBT_TO_INCOME
     borrowing_ok = loan_amount <= max_borrowing
     approved = ltv_ok && dti_ok && borrowing_ok
 
@@ -49,8 +53,8 @@ class AffordabilityCalculator
     return "Application meets all affordability and lending criteria." if ltv_ok && dti_ok && borrowing_ok
     
     reasons = []
-    reasons << "Loan-to-Value ratio (#{ltv}%) exceeds maximum limit of 90%" unless ltv_ok
-    reasons << "Debt-to-Income ratio (#{dti}%) exceeds maximum limit of 45%" unless dti_ok
+    reasons << "Loan-to-Value ratio (#{ltv}%) exceeds maximum limit of #{MAX_LOAN_TO_VALUE}%" unless ltv_ok
+    reasons << "Debt-to-Income ratio (#{dti}%) exceeds maximum limit of #{MAX_DEBT_TO_INCOME}%" unless dti_ok
     reasons << "Required loan amount (£#{(loan_amount).round(2)}) exceeds maximum borrowing capacity (£#{max_borrowing})" unless borrowing_ok
     
     "Declined due to: #{reasons.join('; ')}."
