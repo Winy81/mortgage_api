@@ -10,7 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_132152) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_101010) do
+  create_table "mortgage_applications", force: :cascade do |t|
+    t.decimal "annual_income", precision: 12, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "debt_to_income"
+    t.decimal "deposit_amount", precision: 12, scale: 2, null: false
+    t.text "explanation"
+    t.string "loan_to_value"
+    t.decimal "maximum_borrowing_estimate", precision: 12, scale: 2
+    t.decimal "monthly_expenses", precision: 12, scale: 2, null: false
+    t.decimal "property_value", precision: 12, scale: 2, null: false
+    t.string "status", default: "new", null: false
+    t.integer "term_years", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["status"], name: "index_mortgage_applications_on_status"
+    t.index ["user_id"], name: "index_mortgage_applications_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -22,4 +40,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_132152) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "mortgage_applications", "users"
 end
