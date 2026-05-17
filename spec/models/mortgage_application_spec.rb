@@ -70,7 +70,8 @@ RSpec.describe MortgageApplication, type: :model do
   describe 'Class Methods (Getters)' do
 
     let!(:new_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'new')) }
-    let!(:processing_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'processing')) }
+    let!(:under_process_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'under_process')) }
+    let!(:sent_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'sent')) }
     let!(:likely_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'likely_approved')) }
     let!(:unlikely_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'unlikely_approved')) }
     let!(:approved_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'approved')) }
@@ -83,18 +84,29 @@ RSpec.describe MortgageApplication, type: :model do
         results = MortgageApplication.new_mortgage_applications
 
         expect(results).to include(new_app)
-        expect(results).not_to include(processing_app, likely_app, approved_app)
+        expect(results).not_to include(under_process_app, likely_app, approved_app)
       end
     end
 
     describe '.under_process' do
 
-      it "returns only 'processing' records" do
+      it "returns only 'under_process' records" do
 
         results = MortgageApplication.under_process
 
-        expect(results).to include(processing_app)
-        expect(results).not_to include(new_app, likely_app, approved_app)
+        expect(results).to include(under_process_app)
+        expect(results).not_to include(new_app, sent_app, likely_app, approved_app)
+      end
+    end
+
+    describe '.sent' do
+
+      it "returns only 'sent' records" do
+
+        results = MortgageApplication.sent
+
+        expect(results).to include(sent_app)
+        expect(results).not_to include(new_app, under_process_app, approved_app)
       end
     end
 
@@ -105,7 +117,7 @@ RSpec.describe MortgageApplication, type: :model do
         results = MortgageApplication.likely_approved
 
         expect(results).to include(likely_app)
-        expect(results).not_to include(new_app, processing_app, approved_app)
+        expect(results).not_to include(new_app, under_process_app, approved_app)
       end
     end
 
@@ -143,7 +155,6 @@ RSpec.describe MortgageApplication, type: :model do
     end
   end
 
-
   describe 'Instance Methods (Setters)' do
 
     let(:application) { user.mortgage_applications.create!(valid_attributes.merge(status: 'approved')) }
@@ -158,13 +169,23 @@ RSpec.describe MortgageApplication, type: :model do
       end
     end
 
-    describe '#mark_as_processing!' do
+    describe '#mark_as_under_process!' do
 
-      it "updates status to 'processing'" do
+      it "updates status to 'under_process'" do
 
-        application.mark_as_processing!
+        application.mark_as_under_process!
 
-        expect(application.reload.status).to eq('processing')
+        expect(application.reload.status).to eq('under_process')
+      end
+    end
+
+    describe '#mark_as_sent!' do
+
+      it "updates status to 'sent'" do
+
+        application.mark_as_sent!
+
+        expect(application.reload.status).to eq('sent')
       end
     end
 
@@ -203,7 +224,7 @@ RSpec.describe MortgageApplication, type: :model do
       it "updates status to 'declined'" do
 
         application.mark_as_declined!
-        
+
         expect(application.reload.status).to eq('declined')
       end
     end

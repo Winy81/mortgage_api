@@ -19,7 +19,7 @@ RSpec.describe MortgageProcessStarterJob, type: :job do
 
     context 'when processing a healthy new application' do
 
-      it "transitions the status from 'new' to 'processing' upon passing affordability" do
+      it "transitions the status from 'new' to 'under_process' upon passing affordability" do
 
         passing_application = MortgageApplication.create!(base_attributes)
 
@@ -27,7 +27,7 @@ RSpec.describe MortgageProcessStarterJob, type: :job do
 
         passing_application.reload
 
-        expect(passing_application.status).to eq('processing')
+        expect(passing_application.status).to eq('under_process')
         expect(passing_application.loan_to_value).to eq('75.0%')
         expect(passing_application.debt_to_income).to eq('12.0%')
         expect(passing_application.explanation).to include('meets all affordability and lending criteria')
@@ -37,6 +37,7 @@ RSpec.describe MortgageProcessStarterJob, type: :job do
     context 'when processing an unhealthy new application' do
 
       it "transitions the status from 'new' directly to 'declined' upon failing affordability" do
+
         failing_application = MortgageApplication.create!(
           base_attributes.merge(deposit_amount: 5000)
         )
@@ -56,12 +57,13 @@ RSpec.describe MortgageProcessStarterJob, type: :job do
       it 'exits early without performing calculations or throwing errors' do
 
         processed_application = MortgageApplication.create!(
-          base_attributes.merge(status: 'processing')
+          base_attributes.merge(status: 'under_process')
         )
 
         expect(AffordabilityCalculator).not_to receive(:new)
+
         expect { described_class.new.perform }.not_to raise_error
-        expect(processed_application.reload.status).to eq('processing')
+        expect(processed_application.reload.status).to eq('under_process')
       end
     end
   end

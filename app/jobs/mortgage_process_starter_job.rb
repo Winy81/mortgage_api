@@ -23,7 +23,7 @@ class MortgageProcessStarterJob < ApplicationJob
       )
 
       if result[:decision] == 'approved'
-        app.mark_as_processing!
+        app.mark_as_under_process!
       else
         app.mark_as_declined!
       end

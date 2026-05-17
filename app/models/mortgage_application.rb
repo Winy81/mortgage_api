@@ -2,7 +2,7 @@
 class MortgageApplication < ApplicationRecord
   belongs_to :user
 
-  VALID_STATUSES = ['new', 'processing', 'likely_approved', 'unlikely_approved', 'approved', 'declined'].freeze
+  VALID_STATUSES = ['new', 'under_process', 'sent','likely_approved', 'unlikely_approved', 'approved', 'declined'].freeze
 
   validates :annual_income, :monthly_expenses, :deposit_amount, :property_value, :term_years, :status, presence: true
   validates :annual_income, :monthly_expenses, :deposit_amount, numericality: { greater_than_or_equal_to: 0 }
@@ -15,7 +15,11 @@ class MortgageApplication < ApplicationRecord
   end
 
   def self.under_process
-    where(status: 'processing')
+    where(status: 'under_process')
+  end
+
+  def self.sent
+    where(status: 'sent')
   end
 
   def self.likely_approved
@@ -38,8 +42,12 @@ class MortgageApplication < ApplicationRecord
     update!(status: 'new')
   end
 
-  def mark_as_processing!
-    update!(status: 'processing')
+  def mark_as_under_process!
+    update!(status: 'under_process')
+  end
+
+  def mark_as_sent!
+    update!(status: 'sent')
   end
 
   def mark_as_likely_approved!
