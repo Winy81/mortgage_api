@@ -1,4 +1,3 @@
-# app/models/mortgage_application.rb
 class MortgageApplication < ApplicationRecord
   belongs_to :user
 
@@ -36,6 +35,10 @@ class MortgageApplication < ApplicationRecord
 
   def self.declined
     where(status: 'declined')
+  end
+
+  def new?
+    status == 'new'
   end
 
   def mark_as_new!
