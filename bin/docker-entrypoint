@@ -1,8 +1,9 @@
-#!/bin/bash -e
+set -e
 
-# If running the rails server then create or migrate existing database
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
-  ./bin/rails db:prepare
+# If running the main server command, automatically prepare the database schema
+if [ "$1" = "./bin/thrust" ] || [ "$1" = "bin/rails" ]; then
+  echo "Preparing database..."
+  bin/rails db:prepare
 fi
 
-exec "${@}"
+exec "$@"
