@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe MortgageApplication, type: :model do
-  
+
   let(:user) { User.create!(email: "customer@example.com", password: "password123") }
   
   let(:valid_attributes) do
@@ -28,7 +28,6 @@ RSpec.describe MortgageApplication, type: :model do
     MortgageApplication::VALID_STATUSES.each do |valid_state|
       it "explicitly permits the state '#{valid_state}'" do
         application = MortgageApplication.new(valid_attributes.merge(status: valid_state))
-
         expect(application).to be_valid
       end
     end
@@ -65,6 +64,148 @@ RSpec.describe MortgageApplication, type: :model do
 
       expect(application).not_to be_valid
       expect(application.errors[:property_value]).to include("must be greater than 0")
+    end
+  end
+
+  describe 'Class Methods (Getters)' do
+
+    let!(:new_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'new')) }
+    let!(:processing_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'processing')) }
+    let!(:likely_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'likely_approved')) }
+    let!(:unlikely_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'unlikely_approved')) }
+    let!(:approved_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'approved')) }
+    let!(:declined_app) { user.mortgage_applications.create!(valid_attributes.merge(status: 'declined')) }
+
+    describe '.new_mortgage_applications' do
+
+      it "returns only 'new' records" do
+
+        results = MortgageApplication.new_mortgage_applications
+
+        expect(results).to include(new_app)
+        expect(results).not_to include(processing_app, likely_app, approved_app)
+      end
+    end
+
+    describe '.under_process' do
+
+      it "returns only 'processing' records" do
+
+        results = MortgageApplication.under_process
+
+        expect(results).to include(processing_app)
+        expect(results).not_to include(new_app, likely_app, approved_app)
+      end
+    end
+
+    describe '.likely_approved' do
+
+      it "returns only 'likely_approved' records" do
+
+        results = MortgageApplication.likely_approved
+
+        expect(results).to include(likely_app)
+        expect(results).not_to include(new_app, processing_app, approved_app)
+      end
+    end
+
+    describe '.unlikely_approved' do
+
+      it "returns only 'unlikely_approved' records" do
+
+        results = MortgageApplication.unlikely_approved
+
+        expect(results).to include(unlikely_app)
+        expect(results).not_to include(new_app, approved_app, declined_app)
+      end
+    end
+
+    describe '.approved' do
+
+      it "returns only 'approved' records" do
+
+        results = MortgageApplication.approved
+
+        expect(results).to include(approved_app)
+        expect(results).not_to include(new_app, likely_app, declined_app)
+      end
+    end
+
+    describe '.declined' do
+
+      it "returns only 'declined' records" do
+
+        results = MortgageApplication.declined
+
+        expect(results).to include(declined_app)
+        expect(results).not_to include(new_app, likely_app, approved_app)
+      end
+    end
+  end
+
+
+  describe 'Instance Methods (Setters)' do
+
+    let(:application) { user.mortgage_applications.create!(valid_attributes.merge(status: 'approved')) }
+
+    describe '#mark_as_new!' do
+
+      it "updates status to 'new'" do
+
+        application.mark_as_new!
+
+        expect(application.reload.status).to eq('new')
+      end
+    end
+
+    describe '#mark_as_processing!' do
+
+      it "updates status to 'processing'" do
+
+        application.mark_as_processing!
+
+        expect(application.reload.status).to eq('processing')
+      end
+    end
+
+    describe '#mark_as_likely_approved!' do
+
+      it "updates status to 'likely_approved'" do
+
+        application.mark_as_likely_approved!
+
+        expect(application.reload.status).to eq('likely_approved')
+      end
+    end
+
+    describe '#mark_as_unlikely_approved!' do
+
+      it "updates status to 'unlikely_approved'" do
+
+        application.mark_as_unlikely_approved!
+
+        expect(application.reload.status).to eq('unlikely_approved')
+      end
+    end
+
+    describe '#mark_as_approved!' do
+
+      it "updates status to 'approved'" do
+
+        application.mark_as_approved!
+
+        expect(application.reload.status).to eq('approved')
+      end
+    end
+
+    describe '#mark_as_declined!' do
+
+      it "updates status to 'declined'" do
+
+        application.mark_as_declined!
+        
+        expect(application.reload.status).to eq('declined')
+      end
     end
   end
 end
