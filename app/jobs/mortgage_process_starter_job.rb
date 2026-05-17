@@ -1,4 +1,5 @@
 class MortgageProcessStarterJob < ApplicationJob
+  
   queue_as :default
 
   def perform
